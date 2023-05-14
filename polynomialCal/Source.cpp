@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <stack>
 using namespace std;
 
 class node {
@@ -43,8 +44,10 @@ public:
 		return p;
 	}
 
-	node *CreateTree(string s, node *x, node *y, node *z) {
-		for (int i = 0; i < s.size(); i++) {
+	void CreateTree(string s, int l) {
+		node *x, *y, *z;
+		x = y = z = NULL;
+		for (int i = 0; i < l; i++) {
 			if (s[i] == '+' || s[i] == '*' || s[i] == '/' || s[i] == '^') {
 				z = new node(s[i]);
 				x = POP();
@@ -104,6 +107,154 @@ public:
 			s.insert(s.begin() + i + 1, '0');
 		return s;
 	}
+
+	// Input var x, y
+	string inputVar(string s, char xy) {
+		char var;
+		cout << "Nhap vao bien " << xy << ": ";
+		cin >> var;
+		for (int i = 0; i < s.length(); i++) {
+			if (s[i] == xy)
+				s[i] = var;
+		}
+		return s;
+	}
+
+	string chooseVar(string s1, int check) {
+		if (check == 1) {
+			char varX = 'x';
+			s1 = inputVar(s1, varX);
+			char varY = 'y';
+			s1 = inputVar(s1, varY);
+		}
+		if (check == 2) {
+			char varX = 'x';
+			s1 = inputVar(s1, varX);
+		}
+		if (check == 3) {
+			char varY = 'y';
+			s1 = inputVar(s1, varY);
+		}
+		return s1;
+	}
+
+	// kiem tra bieu thuc co bien hay khong
+	int checkXY(string x) {
+		int check, detect_x = 0, detect_y = 0;
+		for (int i = 0; i < x.length(); i++) {
+			if (x[i] == 'x')
+				detect_x++;
+			if (x[i] == 'y')
+				detect_y++;
+		}
+		if (detect_x != 0 && detect_y != 0)
+			check = 1;
+		if (detect_y == 0)
+			check = 2;
+		if (detect_x == 0)
+			check = 3;
+		if (detect_x == 0 && detect_y == 0)
+			check = 0;
+		return check;
+	}
+
+	// chuyen doi infix --> postfix
+	int prec(char c) {
+		if (c == '^')
+			return 3;
+		else if (c == '/' || c == '*')
+			return 2;
+		else if (c == '+' || c == '-')
+			return 1;
+		else
+			return -1;
+	}
+
+	string infixToPostfix(string s) {
+		stack<char> st;
+		string result;
+		for (int i = 0; i < s.length(); i++) {
+			char c = s[i];
+			if ((c >= 'a'&&c <= 'z') || (c >= 'A'&&c <= 'Z') || (c >= '0'&&c <= '9'))
+				result += c;
+
+			else if (c == '(')
+				st.push('(');
+			else if (c == ')') {
+				while (st.top() != '(') {
+					result += st.top();
+					st.pop();
+				}
+				st.pop();
+			}
+
+			else {
+				while (!st.empty() && prec(s[i]) <= prec(st.top())) {
+					if (c == '^'&&st.top() == '^')
+						break;
+					else {
+						result += st.top();
+						st.pop();
+					}
+				}
+				st.push(c);
+			}
+		}
+		while (!st.empty()) {
+			result += st.top();
+			st.pop();
+		}
+		return result;
+	}
+
+	// thuc hien tinh toan cay nhi phan 
+	double atol(string s)
+	{
+		double x = 0, d = 1;
+		int j = 0, k = 0;
+		if (s[0] == '+' || s[0] == '-')
+		{
+			j = 1;
+			if (s[0] == '-') k = 1;
+		}
+		for (int i = s.size() - 1; i >= j; i--)
+		{
+			switch (s[i])
+			{
+			case '0':x += 0 * d; break;
+			case '1':x += 1 * d; break;
+			case '2':x += 2 * d; break;
+			case '3':x += 3 * d; break;
+			case '4':x += 4 * d; break;
+			case '5':x += 5 * d; break;
+			case '6':x += 6 * d; break;
+			case '7':x += 7 * d; break;
+			case '8':x += 8 * d; break;
+			case '9':x += 9 * d; break;
+			}
+			d *= 10;
+		}
+		if (k == 0)return x;
+		return -x;
+	}
+
+	double Eval(node *t)
+	{
+		long x;
+		if (t)
+		{
+			if (t->data == "+") return Eval(t->left) + Eval(t->right);
+			else if (t->data == "-") return Eval(t->left) - Eval(t->right);
+			else if (t->data == "*") return Eval(t->left)* Eval(t->right);
+			else if (t->data == "/") return Eval(t->left) / Eval(t->right);
+			else if (t->data == "^") return pow(Eval(t->left), Eval(t->right));
+			else return atol(t->data); // chuyen string thanh so
+		}
+		return 0;
+	}
+
+	// main program
+
 
 };
 
