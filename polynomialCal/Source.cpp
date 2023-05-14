@@ -74,12 +74,35 @@ public:
 
 	string dataPreProcess(string s, int i) {
 		int j = i + 1, count;
+		char after = ' ';
 		if (s[i] == '-' && s[i + 1] == '(') {
-			char after = s[i + 2]; // luu ky tu sau ngoac
+			after = s[i + 2]; // luu ky tu sau ngoac
 			for (j; s[j] != ')'; j++) {
-
+				if (s[j] == '+') {
+					s[j] = '-';
+					continue;
+				}
+				if (s[j] == '-')
+					s[j] = '+';
+				count = j;
+			}
+			s.erase(s.begin() + i + 1); // xoa dau '('
+			s.erase(s.begin() + count); //xoa dau ')'
+			if (after == '-') {
+				s.erase(s.begin() + i);
+				s.erase(s.begin() + i);
+				if (i != 0 && s[i - 1] != '*' && s[i - 1] != '/' && s[i - 1] != '^')
+					s.insert(s.begin() + i, '+'); //neu dau tru khong o dau chuoi, truoc do la *,/,^ thi thay -- thanh +
+			}
+			else { // neu sau dau ngoac khong phai dau tru
+				s.insert(s.begin() + i, '0');
+				if (i != 0 && s[i - 1] != '*' && s[i - 1] != '/' && s[i - 1] != '^')
+					s.insert(s.begin() + i, '+');
 			}
 		}
+		if (s[i] == '(' && s[i + 1] == '-') // vd: b+(-a)
+			s.insert(s.begin() + i + 1, '0');
+		return s;
 	}
 
 };
