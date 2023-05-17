@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <stack>
+#include <cmath>
 using namespace std;
 
 class node {
@@ -22,7 +23,7 @@ public:
 
 class Tree {
 public:
-	node *head;
+	node *head; 
 public:
 	//init tree
 	Tree() {
@@ -44,7 +45,7 @@ public:
 		return p;
 	}
 
-	void CreateTree(string s, int l) {
+	void createPolyTree(string s, int l) {
 		node *x, *y, *z;
 		x = y = z = NULL;
 		for (int i = 0; i < l; i++) {
@@ -54,7 +55,7 @@ public:
 				y = POP();
 				z->left = y;
 				z->right = x;
-				PUSH(z);
+				PUSH(z); // final tree
 			}
 			else {
 				z = new node(s[i]);
@@ -67,6 +68,7 @@ public:
 class Cal {
 public:
 	string dataIn;
+	Tree t;
 public:
 
 	void inputPol() {
@@ -122,18 +124,14 @@ public:
 
 	string chooseVar(string s1, int check) {
 		if (check == 1) {
-			char varX = 'x';
-			s1 = inputVar(s1, varX);
-			char varY = 'y';
-			s1 = inputVar(s1, varY);
+			s1 = inputVar(s1, 'x');
+			s1 = inputVar(s1, 'y');
 		}
 		if (check == 2) {
-			char varX = 'x';
-			s1 = inputVar(s1, varX);
+			s1 = inputVar(s1, 'x');
 		}
 		if (check == 3) {
-			char varY = 'y';
-			s1 = inputVar(s1, varY);
+			s1 = inputVar(s1, 'y');
 		}
 		return s1;
 	}
@@ -207,7 +205,7 @@ public:
 		return result;
 	}
 
-	// thuc hien tinh toan cay nhi phan 
+	// chuyen string thanh so
 	double atol(string s)
 	{
 		double x = 0, d = 1;
@@ -254,10 +252,48 @@ public:
 	}
 
 	// main program
+	void program() {
+		string s, s1;
+		int select;
 
+		cout << "*Da thuc chi co the chua: " << endl;
+		cout << "\t" << "- Hang so la cac so nguyen co mot chu so: 0 --> 9" << endl;
+		cout << "\t" << "- Toan tu: *,/,+,-,^ va dau '(' ; ')'" << endl;
+		cout << "\t" << "- Cac bien x va y " << endl;
+		cout << "*Viet so am theo dang: (-a)" << endl;
+		cout << "*Nhap ro rang cac toan tu" << endl;
+		cout << "---------------------------" << endl;
 
+		do {
+			cout << "-->Nhap 1 de tiep tuc, Nhap 0 de thoat: ";
+			cin >> select;
+
+			cout << "Moi nhap da thuc: ";
+			cin.ignore();
+			getline(cin, s);
+
+			for (int i = 0; i < s.length(); i++) {
+				s = dataPreProcess(s, i);
+			}
+
+			s1 = infixToPostfix(s);
+
+			int chk;
+			chk = checkXY(s1);
+			if (chk != 0)
+				s1 = chooseVar(s1, chk);
+
+			t.createPolyTree(s1, s1.length());
+			cout << "Ket qua cua da thuc tren la: ";
+			cout << Eval(t.head);
+			cout << "\n\n";
+			system("pause");
+		} while (select != 0);
+	}
 };
 
 int main(){
+	Cal c;
+	c.program();
 	return 0;
 }
